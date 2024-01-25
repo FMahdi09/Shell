@@ -1,14 +1,29 @@
 #include "headers.h"
 #include "globals.h"
 
-/* checks if the shell is running in interactive mode
-// If it is:
-//      - puts itself in the foreground
-//      - ignores all interactive and job-control signals
-//      - puts itself in its own process group
-//      - grabs control of the terminal
+/* 
+sets the following global variables:
+        - name of logged in user
+        - name of host machine
+        - current working directory
 */
-void initShell ()
+void set_env_vars ()
+{
+        getlogin_r (user, MAX_BUF_LEN - 1);
+        gethostname (hostname, MAX_BUF_LEN - 1);
+        getcwd (cwd, MAX_BUF_LEN - 1);
+}
+
+/* 
+checks if the shell is running in interactive mode
+If it is:
+        - puts itself in the foreground
+        - ignores all interactive and job-control signals
+        - puts itself in its own process group
+        - grabs control of the terminal
+        - sets global variables
+*/
+void init_shell ()
 {
         shell_terminal = STDIN_FILENO;
         shell_is_interactive = isatty(shell_terminal);
@@ -33,5 +48,7 @@ void initShell ()
                 }
 
                 tcsetpgrp (shell_terminal, shell_pgid);
+
+                set_env_vars ();
         }
 }

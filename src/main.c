@@ -5,5 +5,6 @@
 
 int main (int argc, char* argv[])
 {
-        initShell ();
+        init_shell ();
+        print_prompt ();
 }

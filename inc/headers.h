@@ -7,3 +7,5 @@
 #include <sys/types.h>
 #include <signal.h>
 #include <errno.h>
+
+#define MAX_BUF_LEN 1024

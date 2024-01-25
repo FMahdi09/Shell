@@ -21,8 +21,18 @@ EXTERN pid_t shell_pgid;
 // process id of the shell
 EXTERN pid_t shell_pid;
 
+// name of user logged into the controlling terminal
+EXTERN char user[MAX_BUF_LEN];
+
+// system hostname
+EXTERN char hostname[MAX_BUF_LEN];
+
+// current working directory
+EXTERN char cwd[MAX_BUF_LEN];
+
 /* FUNCTION DECLARATIONS */
 
-void initShell ();
+void init_shell ();
+void print_prompt ();
 
 #endif
