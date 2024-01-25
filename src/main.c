@@ -1,6 +1,9 @@
-#include "stdio.h"
+#define EXTERN
 
-int main(int argc, char* argv[])
+#include "headers.h"
+#include "globals.h"
+
+int main (int argc, char* argv[])
 {
-    printf("Hello world!\n");
+        initShell ();
 }
