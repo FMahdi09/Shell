@@ -65,5 +65,7 @@ void print_prompt ();
 void launch_process (process* p, pid_t pgid, int infile, int outfile, int errfile, int foreground);
 void launch_job (job* j, int foreground);
 void print_job_info (job* j, const char* status);
+int mark_process_status (pid_t pid, int status);
+void wait_for_job (job* j);
 
 #endif

@@ -7,5 +7,7 @@
 #include <sys/types.h>
 #include <signal.h>
 #include <errno.h>
+#include <sys/wait.h>
+#include <fcntl.h>
 
 #define MAX_BUF_LEN 1024

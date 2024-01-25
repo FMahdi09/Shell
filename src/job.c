@@ -57,6 +57,35 @@ int job_is_completed (job* j)
 }
 
 /*
+put job in foreground, if cont is set sends SIGCONT to the jobs process group
+*/
+void put_job_in_foreground (job* j, int cont)
+{
+        tcsetpgrp (shell_terminal, j->pgid);
+
+        wait_for_job (j);
+
+        tcsetpgrp (shell_terminal, shell_pgid);
+}
+
+/*
+waits for job until all processes have either completed or stopped
+*/
+void wait_for_job (job* j)
+{
+        int status;
+        pid_t pid;
+
+        do
+        {
+                pid = waitpid (-1, &status, WUNTRACED);
+        } while (!mark_process_status (pid, status)
+                 && !job_is_completed (j)
+                 && !job_is_stopped (j));
+        
+}
+
+/*
 launches a complete job and puts it in the foreground if specified
 */
 void launch_job (job* j, int foreground)
@@ -98,16 +127,15 @@ void launch_job (job* j, int foreground)
                         if (shell_is_interactive)
                         {
                                 if (j->pgid == 0)
-                                {
                                         j->pgid = pid;
-                                        setpgid(pid, j->pgid);
-                                }
+
+                                setpgid (pid, j->pgid);
                         }
                 }
 
-                if (infile != STDIN_FILENO)
+                if (infile != j->stdin)
                         close (infile);
-                if (outfile != STDOUT_FILENO)
+                if (outfile != j->stdout)
                         close (outfile);
                 
                 infile = mypipe[0];
@@ -115,12 +143,7 @@ void launch_job (job* j, int foreground)
         }
 
         print_job_info (j, "launched");
-}
 
-/*
-put job in foreground, if cont is set sends SIGCONT to the jobs process group
-*/
-void put_job_in_foreground (job* j, int cont)
-{
-        tcsetpgrp(shell_terminal, j->pgid);
+        if(foreground)
+                put_job_in_foreground (j, 0);
 }

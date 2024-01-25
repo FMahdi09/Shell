@@ -47,3 +47,35 @@ void launch_process (process* p, pid_t pgid, int infile, int outfile, int errfil
         perror ("launch process execvp");
         exit (1);
 }
+
+/*
+sets the status of given process
+*/
+int mark_process_status (pid_t pid, int status)
+{
+        job* j = first_job;
+        process* p;
+
+        while (j != NULL)
+        {
+                p = j->first_process;
+                while (p != NULL)
+                {
+                        if (p->pid == pid)
+                        {
+                                p->status = status;
+
+                                if (WIFSTOPPED (status))
+                                        p->stopped = 1;
+                                else
+                                        p->completed = 1;
+
+                                return 0;
+                        }
+                        p = p->next;
+                }
+                j = j->next;
+        }
+
+        return -1;
+}

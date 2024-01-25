@@ -7,10 +7,16 @@ int main (int argc, char* argv[])
 {
         init_shell ();
 
-        process my_process =
+        process echo =
         {
                 .next = NULL,
-                .argv = (char* []){"ls"}
+                .argv = (char* []){"wc", NULL}
+        };
+
+        process my_process =
+        {
+                .next = &echo,
+                .argv = (char* []){"ls", NULL}
         };
 
         job my_job =
@@ -21,7 +27,7 @@ int main (int argc, char* argv[])
                 .stdin = STDIN_FILENO,
                 .stdout = STDOUT_FILENO,
                 .pgid = 0,
-                .command = "ls"
+                .command = "testing"
         };
 
         launch_job(&my_job, 1);
