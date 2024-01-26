@@ -5,6 +5,7 @@ INC_DIR = inc
 
 C = gcc
 CFLAGS = -Wall -Werror -g -I $(INC_DIR)
+# LDFLAGS = -fsanitize=address -fno-omit-frame-pointer
 
 EXE = $(BIN_DIR)/shell.out
 
@@ -13,13 +14,8 @@ OBJECTS = $(SOURCES:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
 all: $(EXE)
 
-run:
-	$(EXE)
-
-rebuild: clean $(EXE)
-
 $(EXE): $(OBJECTS) | $(BIN_DIR)
-	$(C) -o $@ $^
+	$(C) -o $@ $^ $(LDFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 	$(C) $(CFLAGS) -c $< -o $@

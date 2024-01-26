@@ -79,3 +79,39 @@ int mark_process_status (pid_t pid, int status)
 
         return -1;
 }
+
+/*
+adds process to the end of linked list
+*/
+process* add_process (process* head, process* new)
+{
+        if (head == NULL)
+                return new;
+
+        process* tmp = head;
+
+        while (tmp)
+        {
+                if (tmp->next == NULL)
+                {
+                        tmp->next = new;
+                        return head;
+                }
+
+                tmp = tmp->next;
+        }
+
+        return head;
+}
+
+/*
+creates a new process with next set to null and argv set to provided string array
+*/
+process* create_process (char** argv)
+{
+        process* new_process = malloc (sizeof (process));
+        new_process->next = NULL;
+        new_process->argv = argv;
+
+        return new_process;
+}

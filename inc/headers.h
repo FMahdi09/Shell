@@ -9,5 +9,7 @@
 #include <errno.h>
 #include <sys/wait.h>
 #include <fcntl.h>
+#include <ctype.h>
+#include <string.h>
 
 #define MAX_BUF_LEN 1024

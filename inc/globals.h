@@ -26,7 +26,6 @@ typedef struct job
         process* first_process;
         pid_t pgid;
         int notified;
-        struct termios tmodes;
         int stdin;
         int stdout;
         int stderr;
@@ -67,5 +66,12 @@ void launch_job (job* j, int foreground);
 void print_job_info (job* j, const char* status);
 int mark_process_status (pid_t pid, int status);
 void wait_for_job (job* j);
+char** parse_input_string (char* buffer, const char delim);
+char* trim_whitespaces (char* str);
+job* parse_job (char** command);
+void free_string_arr (char** arr);
+char** copy_string_arr (char** arr, size_t size);
+process* add_process (process* head, process* new);
+process* create_process (char** argv);
 
 #endif
