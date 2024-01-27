@@ -39,7 +39,6 @@ void init_shell ()
                 signal (SIGTSTP, SIG_IGN);
                 signal (SIGTTIN, SIG_IGN);
                 signal (SIGTTOU, SIG_IGN);
-                signal (SIGCHLD, SIG_IGN);
 
                 shell_pid = getpid ();
                 if (setpgid (shell_pid, shell_pgid) < 0)

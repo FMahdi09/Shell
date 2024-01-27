@@ -60,6 +60,7 @@ job* parse_job (char** command)
         int start = 0;
         int cur = start;
         process* first_process = NULL;
+        int foreground = 1;
 
         while (*tmp)
         {
@@ -80,6 +81,17 @@ job* parse_job (char** command)
 
                         start = cur + 1;
                 }
+                /*else if (*(tmp + 1) == NULL &&
+                         strcmp (*tmp, "&") == 0)
+                {
+                        foreground = 0;
+                        
+                        char** argv = copy_string_arr (command + start, cur - start);
+
+                        process* new_process = create_process (argv);
+
+                        first_process = add_process (first_process, new_process);
+                }*/
                 else if (*(tmp + 1) == NULL)
                 {
                         char** argv = copy_string_arr (command + start, cur + 1 - start);
@@ -99,8 +111,11 @@ job* parse_job (char** command)
         new_job->stderr = STDERR_FILENO;
         new_job->stdin = STDIN_FILENO;
         new_job->stdout = STDOUT_FILENO;
-        new_job->command = "testing";
+        new_job->command = malloc (sizeof (char) * 4);
+        strcpy (new_job->command, "abc");
         new_job->pgid = 0;
+        new_job->notified = 0;
+        new_job->foreground = foreground;
 
         return new_job;
 }

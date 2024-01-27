@@ -142,8 +142,111 @@ void launch_job (job* j, int foreground)
                 p = p->next;
         }
 
-        print_job_info (j, "launched");
-
         if(foreground)
                 put_job_in_foreground (j, 0);
+}
+
+/*
+adds job to the end of jobs linked list
+*/
+void add_job (job* new_job)
+{
+        if (first_job == NULL)
+        {
+                first_job = new_job;
+                return;
+        }
+
+        job* tmp = first_job;
+
+        while (tmp != NULL)
+        {
+                if (tmp->next == NULL)
+                {
+                        tmp->next = new_job;
+                        return;
+                }
+                tmp = tmp->next;
+        }
+}
+
+/*
+removes a specific job from the list
+*/
+void remove_job (job* j)
+{
+        job* tmp = first_job;
+        job* before_tmp = NULL;
+
+        if (j == first_job)
+        {
+                first_job = first_job->next;
+                free_job (j);
+                return;
+        }
+
+        while (tmp != j)
+        {
+                before_tmp = tmp;
+                tmp = tmp->next;
+        }
+
+        before_tmp->next = tmp->next;
+        free_job (j);
+}
+
+/*
+deallocates all memory associated with a job
+*/
+void free_job (job* j)
+{
+        free_process_list (j->first_process);
+        free (j->command);
+        free (j);
+}
+
+/*
+non-blocking check if any processes have information available
+*/
+void update_status ()
+{
+        int status;
+        pid_t pid;
+
+        do
+        {
+                pid = waitpid (-1, &status, WUNTRACED | WNOHANG);
+        } while (!mark_process_status (pid, status));
+}
+
+/*
+iterates over all jobs and checks if all processes have stopped or completed
+updates status and notifies user
+*/
+void update_jobs ()
+{
+        update_status ();
+
+        job* tmp = first_job;
+
+        while (tmp != NULL)
+        {
+                if (job_is_completed (tmp))
+                {
+                        print_job_info (tmp, "completed");
+                        job* to_remove = tmp;
+                        tmp = tmp->next;
+                        remove_job (to_remove);
+                }
+                else if (job_is_stopped (tmp) && !tmp->notified)
+                {
+                        print_job_info (tmp, "stopped");
+                        tmp->notified = 1;
+                        tmp = tmp->next;
+                }
+                else
+                {
+                        tmp = tmp->next;
+                }
+        }
 }

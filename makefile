@@ -4,8 +4,8 @@ BIN_DIR = bin
 INC_DIR = inc
 
 C = gcc
-CFLAGS = -Wall -Werror -g -I $(INC_DIR)
-# LDFLAGS = -fsanitize=address -fno-omit-frame-pointer
+CFLAGS = -Wall -Werror -fsanitize=address -fno-omit-frame-pointer -g -I $(INC_DIR)
+LDFLAGS = -fsanitize=address -fno-omit-frame-pointer
 
 EXE = $(BIN_DIR)/shell.out
 

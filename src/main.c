@@ -8,6 +8,7 @@ int main (int argc, char* argv[])
         int done = 0;
         char* buffer = NULL;
         size_t char_read, size = 0;
+        first_job = NULL;
 
         init_shell ();
 
@@ -27,21 +28,24 @@ int main (int argc, char* argv[])
 
                 char** command = parse_input_string (buffer, ' ');
 
-                if (command && strcmp (command[0], "exit") == 0)
+                if (command != NULL && strcmp (command[0], "exit") == 0)
                 {
                         done = 1;
+                        free_string_arr (command);
                 }
-                else if (command)
+                else if (command != NULL)
                 {
                         job* new_job = parse_job (command);
 
                         if (new_job)
                         {
-                                launch_job (new_job, 1);
+                                add_job (new_job);
+                                launch_job (new_job, new_job->foreground);
                         }
 
                         free_string_arr (command);
                 }
 
+                update_jobs ();
         }
 }

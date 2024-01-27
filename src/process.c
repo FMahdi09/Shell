@@ -24,7 +24,6 @@ void launch_process (process* p, pid_t pgid, int infile, int outfile, int errfil
                 signal (SIGTSTP, SIG_DFL);
                 signal (SIGTTIN, SIG_DFL);
                 signal (SIGTTOU, SIG_DFL);
-                signal (SIGCHLD, SIG_DFL);
         }
 
         if (infile != STDIN_FILENO)
@@ -90,7 +89,7 @@ process* add_process (process* head, process* new)
 
         process* tmp = head;
 
-        while (tmp)
+        while (tmp != NULL)
         {
                 if (tmp->next == NULL)
                 {
@@ -112,6 +111,25 @@ process* create_process (char** argv)
         process* new_process = malloc (sizeof (process));
         new_process->next = NULL;
         new_process->argv = argv;
+        new_process->completed = 0;
+        new_process->stopped = 0;
 
         return new_process;
+}
+
+/*
+deallocates all memory associated with a list of processes
+*/
+void free_process_list (process* p)
+{
+        process* tmp;
+
+        while (p != NULL)
+        {
+                tmp = p;
+                p = p->next;
+
+                free_string_arr (tmp->argv);
+                free (tmp);
+        }
 }

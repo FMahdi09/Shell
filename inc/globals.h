@@ -26,6 +26,7 @@ typedef struct job
         process* first_process;
         pid_t pgid;
         int notified;
+        int foreground;
         int stdin;
         int stdout;
         int stderr;
@@ -73,5 +74,10 @@ void free_string_arr (char** arr);
 char** copy_string_arr (char** arr, size_t size);
 process* add_process (process* head, process* new);
 process* create_process (char** argv);
+void add_job (job* new_job);
+void free_process_list (process* p);
+void update_status ();
+void update_jobs ();
+void free_job (job* j);
 
 #endif
