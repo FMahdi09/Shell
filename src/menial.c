@@ -20,7 +20,7 @@ void print_job_info (job* j, const char* status)
 }
 
 /*
-deallocates memory of an array of strings which is null terminated
+deallocates memory of a null terminated string array
 */
 void free_string_arr (char** arr)
 {
@@ -36,7 +36,7 @@ void free_string_arr (char** arr)
 }
 
 /*
-returns a copy of string array and null terminates it
+returns a copy of a string array and null terminates it
 */
 char** copy_string_arr (char** arr, size_t size)
 {
@@ -48,4 +48,36 @@ char** copy_string_arr (char** arr, size_t size)
         copy[size] = NULL;
 
         return copy;
+}
+
+/*
+concats a null terminated array of strings into a single string
+seperates strings with spaces
+*/
+char* string_from_arr (char** arr)
+{
+        int length = 0;
+        char** tmp_arr = arr;
+
+        while (*tmp_arr != NULL)
+        {
+                length += strlen (*tmp_arr) + 1;
+                ++tmp_arr;
+        }
+
+        char* result = malloc (sizeof (char) * (length + 1));
+        char* tmp_result = result;
+        tmp_arr = arr;
+
+        while (*tmp_arr != NULL)
+        {
+                strcpy (tmp_result, *tmp_arr);
+                tmp_result[strlen (*tmp_arr)] = ' ';
+                tmp_result += strlen (*tmp_arr) + 1;
+
+                ++tmp_arr;
+        }
+        result[length] = '\0';
+
+        return result;
 }

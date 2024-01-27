@@ -32,19 +32,19 @@ char** parse_input_string (char* buffer, const char delim)
 
         char** parsed = malloc (sizeof (char*) * (count + 1));
 
-        if (!parsed)
+        if (parsed == NULL)
                 return NULL;
 
         char* token = strtok (trimmed, &delim);
         int index = 0;
 
-        while (token)
+        while (token != NULL)
         {
                 *(parsed + index++) = strdup (token);
                 token = strtok (NULL, &delim);
         }
 
-        *(parsed + index) = 0;
+        parsed[index] = 0;
 
         return parsed;
 }
@@ -105,17 +105,16 @@ job* parse_job (char** command)
                 ++tmp;
         }
 
-        job* new_job = malloc (sizeof (job));
-        new_job->next = NULL;
-        new_job->first_process = first_process;
-        new_job->stderr = STDERR_FILENO;
-        new_job->stdin = STDIN_FILENO;
-        new_job->stdout = STDOUT_FILENO;
-        new_job->command = malloc (sizeof (char) * 4);
-        strcpy (new_job->command, "abc");
-        new_job->pgid = 0;
-        new_job->notified = 0;
-        new_job->foreground = foreground;
+        char* command_string = string_from_arr (command);
+
+        job* new_job = create_job (
+                first_process,
+                STDIN_FILENO,
+                STDOUT_FILENO,
+                STDERR_FILENO,
+                foreground,
+                command_string
+        );
 
         return new_job;
 }

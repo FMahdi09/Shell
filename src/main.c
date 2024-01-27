@@ -37,7 +37,7 @@ int main (int argc, char* argv[])
                 {
                         job* new_job = parse_job (command);
 
-                        if (new_job)
+                        if (new_job != NULL)
                         {
                                 add_job (new_job);
                                 launch_job (new_job, new_job->foreground);

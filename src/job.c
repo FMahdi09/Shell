@@ -220,7 +220,7 @@ void update_status ()
 }
 
 /*
-iterates over all jobs and checks if all processes have stopped or completed
+iterates over all jobs and checks if any processes have stopped or completed
 updates status and notifies user
 */
 void update_jobs ()
@@ -249,4 +249,24 @@ void update_jobs ()
                         tmp = tmp->next;
                 }
         }
+}
+
+/*
+allocates and returns a job with provided values
+the command argument needs to point to an allocted string 
+which must not be manually deallocated after creating the job
+*/
+job* create_job (process * first_process, int in, int out, int err, int foreground, char* command)
+{
+        job* new_job = malloc (sizeof (job));
+        new_job->next = NULL;
+        new_job->first_process = first_process;
+        new_job->stdin = in;
+        new_job->stdout = out;
+        new_job->stderr = err;
+        new_job->foreground = foreground;
+        new_job->command = command;
+        new_job->pgid = 0;
+
+        return new_job;
 }

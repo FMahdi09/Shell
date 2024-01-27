@@ -79,5 +79,7 @@ void free_process_list (process* p);
 void update_status ();
 void update_jobs ();
 void free_job (job* j);
+char* string_from_arr (char** arr);
+job* create_job (process * first_process, int in, int out, int err, int foreground, char* command);
 
 #endif
