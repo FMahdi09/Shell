@@ -1,7 +1,15 @@
 #define EXTERN
 
-#include "headers.h"
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 #include "globals.h"
+#include "job.h"
+#include "setup.h"
+#include "menial.h"
+#include "parser.h"
 
 int main (int argc, char* argv[])
 {
@@ -14,6 +22,8 @@ int main (int argc, char* argv[])
 
         while (!done)
         {
+                update_jobs ();
+
                 print_prompt ();
 
                 char_read = getline (&buffer, &size, stdin);
@@ -21,7 +31,7 @@ int main (int argc, char* argv[])
                 if (char_read < 0)
                 {
                         perror ("getline");
-                        return 1;
+                        return EXIT_FAILURE;
                 }
 
                 buffer[char_read - 1] = '\0';
@@ -45,7 +55,9 @@ int main (int argc, char* argv[])
 
                         free_string_arr (command);
                 }
-
-                update_jobs ();
         }
+
+        free (buffer);
+
+        return EXIT_SUCCESS;
 }

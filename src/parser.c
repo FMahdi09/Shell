@@ -1,5 +1,34 @@
-#include "headers.h"
-#include "globals.h"
+#include <unistd.h>
+#include <ctype.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+#include "job.h"
+#include "menial.h"
+
+/*
+trims all leading/trailing whitespaces
+returns a substring of the original which must not be deallocated
+if the original was allocated dynamically
+*/
+char* trim_whitespaces (char* str)
+{
+        while (isspace (*str))
+                ++str;
+
+        if (*str == '\0')
+                return str;
+
+        char* end = str + strlen (str) - 1;
+
+        while (isspace (*end) && end > str)
+                --end;
+
+        end[1] = '\0';
+
+        return str;
+}
 
 /*
 splits a string into an array of words seperated by delim character
@@ -44,7 +73,7 @@ char** parse_input_string (char* buffer, const char delim)
                 token = strtok (NULL, &delim);
         }
 
-        parsed[index] = 0;
+        parsed[count] = '\0';
 
         return parsed;
 }
@@ -53,7 +82,6 @@ char** parse_input_string (char* buffer, const char delim)
 takes in an array of cl arguments and constructs a job according to them
 returns NULL if the arguments are invalid
 */
-
 job* parse_job (char** command)
 {
         char** tmp = command;
@@ -117,27 +145,4 @@ job* parse_job (char** command)
         );
 
         return new_job;
-}
-
-/*
-trims all leading/trailing whitespaces
-returns a substring of the original which must not be deallocated
-if the original was allocated dynamically
-*/
-char* trim_whitespaces (char* str)
-{
-        while (isspace (*str))
-                ++str;
-
-        if (*str == '\0')
-                return str;
-
-        char* end = str + strlen (str) - 1;
-
-        while (isspace (*end) && end > str)
-                --end;
-
-        end[1] = '\0';
-
-        return str;
 }

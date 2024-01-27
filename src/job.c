@@ -1,5 +1,19 @@
-#include "headers.h"
+#include <unistd.h>
+#include <sys/wait.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "globals.h"
+#include "job.h"
+
+/*
+prints out job info to standard output
+format: <process group id> (<status>): <command>
+*/
+void print_job_info (job* j, const char* status)
+{
+        printf("%ld (%s): %s\n", (long)j->pgid, status, j->command);
+}
 
 /*
 returns the active job with the indicated pgid
@@ -57,15 +71,13 @@ int job_is_completed (job* j)
 }
 
 /*
-put job in foreground, if cont is set sends SIGCONT to the jobs process group
+deallocates all memory associated with a job
 */
-void put_job_in_foreground (job* j, int cont)
+void free_job (job* j)
 {
-        tcsetpgrp (shell_terminal, j->pgid);
-
-        wait_for_job (j);
-
-        tcsetpgrp (shell_terminal, shell_pgid);
+        free_process_list (j->first_process);
+        free (j->command);
+        free (j);
 }
 
 /*
@@ -86,6 +98,19 @@ void wait_for_job (job* j)
 }
 
 /*
+put job in foreground, if cont is set sends SIGCONT to the jobs process group
+*/
+void put_job_in_foreground (job* j, int cont)
+{
+        tcsetpgrp (shell_terminal, j->pgid);
+
+        wait_for_job (j);
+
+        tcsetpgrp (shell_terminal, shell_pgid);
+}
+
+
+/*
 launches a complete job and puts it in the foreground if specified
 */
 void launch_job (job* j, int foreground)
@@ -102,7 +127,7 @@ void launch_job (job* j, int foreground)
                         if (pipe (mypipe) < 0)
                         {
                                 perror ("pipe");
-                                exit (1);
+                                exit (EXIT_FAILURE);
                         }
                         outfile = mypipe[1];
                 }
@@ -196,16 +221,6 @@ void remove_job (job* j)
 }
 
 /*
-deallocates all memory associated with a job
-*/
-void free_job (job* j)
-{
-        free_process_list (j->first_process);
-        free (j->command);
-        free (j);
-}
-
-/*
 non-blocking check if any processes have information available
 */
 void update_status ()
@@ -256,7 +271,7 @@ allocates and returns a job with provided values
 the command argument needs to point to an allocted string 
 which must not be manually deallocated after creating the job
 */
-job* create_job (process * first_process, int in, int out, int err, int foreground, char* command)
+job* create_job (process* first_process, int in, int out, int err, int foreground, char* command)
 {
         job* new_job = malloc (sizeof (job));
         new_job->next = NULL;

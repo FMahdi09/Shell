@@ -1,5 +1,12 @@
-#include "headers.h"
+#include <unistd.h>
+#include <sys/types.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "globals.h"
+#include "process.h"
+#include "menial.h"
 
 /*
 launches the given process and sets std in, out and err

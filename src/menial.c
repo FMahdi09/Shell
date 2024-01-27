@@ -1,5 +1,10 @@
-#include "headers.h"
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 #include "globals.h"
+#include "job.h"
 
 /* 
 prints the shell prompt to standard output
@@ -8,15 +13,6 @@ format: <user>@<hostmachine>:<working_directory>€
 void print_prompt ()
 {
         printf("%s@%s:%s€ ", user, hostname, cwd);
-}
-
-/*
-prints out job info to standard output
-format: <process group id> (<status>): <command>
-*/
-void print_job_info (job* j, const char* status)
-{
-        printf("%ld (%s): %s\n", (long)j->pgid, status, j->command);
 }
 
 /*
