@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 #include "job.h"
 #include "menial.h"
@@ -14,26 +15,28 @@ if the original was allocated dynamically
 */
 char* trim_whitespaces (char* str)
 {
-        while (isspace (*str))
-                ++str;
+        char* tmp = str;
 
-        if (*str == '\0')
-                return str;
+        while (isspace (*tmp))
+                ++tmp;
 
-        char* end = str + strlen (str) - 1;
+        if (*tmp == '\0')
+                return tmp;
 
-        while (isspace (*end) && end > str)
+        char* end = tmp + strlen (tmp) - 1;
+
+        while (isspace (*end) && end > tmp)
                 --end;
 
         end[1] = '\0';
 
-        return str;
+        return tmp;
 }
 
 /*
 splits a string into an array of words seperated by delim character
 */
-char** parse_input_string (char* buffer, const char delim)
+char** parse_input_string (char* buffer)
 {
         int count = 0;
         int whitespace = 0;
@@ -64,16 +67,16 @@ char** parse_input_string (char* buffer, const char delim)
         if (parsed == NULL)
                 return NULL;
 
-        char* token = strtok (trimmed, &delim);
+        char* token = strtok (trimmed, " ");
         int index = 0;
 
         while (token != NULL)
         {
-                *(parsed + index++) = strdup (token);
-                token = strtok (NULL, &delim);
+                parsed[index++] = strdup (token);
+                token = strtok (NULL, " ");
         }
 
-        parsed[count] = '\0';
+        parsed[index] = '\0';
 
         return parsed;
 }

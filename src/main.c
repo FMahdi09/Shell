@@ -36,7 +36,7 @@ int main (int argc, char* argv[])
 
                 buffer[char_read - 1] = '\0';
 
-                char** command = parse_input_string (buffer, ' ');
+                char** command = parse_input_string (buffer);
 
                 if (command != NULL && strcmp (command[0], "exit") == 0)
                 {
