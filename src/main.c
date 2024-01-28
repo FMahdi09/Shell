@@ -50,7 +50,7 @@ int main (int argc, char* argv[])
                         if (new_job != NULL)
                         {
                                 add_job (new_job);
-                                launch_job (new_job, new_job->foreground);
+                                launch_job (new_job);
                         }
 
                         free_string_arr (command);

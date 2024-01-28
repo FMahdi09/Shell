@@ -113,7 +113,7 @@ void put_job_in_foreground (job* j, int cont)
 /*
 launches a complete job and puts it in the foreground if specified
 */
-void launch_job (job* j, int foreground)
+void launch_job (job* j)
 {
         process* p = j->first_process;
         int mypipe[2];
@@ -139,7 +139,7 @@ void launch_job (job* j, int foreground)
                 pid_t pid = fork ();
                 if (pid == 0)
                 {
-                        launch_process (p, j->pgid, infile, outfile, j->stderr, foreground);
+                        launch_process (p, j->pgid, infile, outfile, j->stderr, j->foreground);
                 }
                 else if (pid < 0)
                 {
@@ -167,7 +167,7 @@ void launch_job (job* j, int foreground)
                 p = p->next;
         }
 
-        if(foreground)
+        if(j->foreground)
                 put_job_in_foreground (j, 0);
 }
 

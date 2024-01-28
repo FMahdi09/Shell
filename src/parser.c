@@ -112,7 +112,7 @@ job* parse_job (char** command)
 
                         start = cur + 1;
                 }
-                /*else if (*(tmp + 1) == NULL &&
+                else if (*(tmp + 1) == NULL &&
                          strcmp (*tmp, "&") == 0)
                 {
                         foreground = 0;
@@ -122,7 +122,7 @@ job* parse_job (char** command)
                         process* new_process = create_process (argv);
 
                         first_process = add_process (first_process, new_process);
-                }*/
+                }
                 else if (*(tmp + 1) == NULL)
                 {
                         char** argv = copy_string_arr (command + start, cur + 1 - start);

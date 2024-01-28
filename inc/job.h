@@ -22,7 +22,7 @@ typedef struct job
 
 /* FUNCTION DECLARATIONS */
 
-void launch_job (job* j, int foreground);
+void launch_job (job* j);
 void add_job (job* new_job);
 void print_job_info (job* j, const char* status);
 void update_jobs ();
