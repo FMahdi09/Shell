@@ -14,7 +14,7 @@ if shell is in interactive mode:
         - sets the pgid
         - puts it into the foreground if specified
 */
-void launch_process (process* p, pid_t pgid, int infile, int outfile, int errfile, int foreground)
+void launch_process (process* p, pid_t pgid, int foreground)
 {
         if (shell_is_interactive)
         {
@@ -33,25 +33,25 @@ void launch_process (process* p, pid_t pgid, int infile, int outfile, int errfil
                 signal (SIGTTOU, SIG_DFL);
         }
 
-        if (infile != STDIN_FILENO)
+        if (p->stdin != STDIN_FILENO)
         {
-                dup2 (infile, STDIN_FILENO);
-                close (infile);
+                dup2 (p->stdin, STDIN_FILENO);
+                close (p->stdin);
         }
-        if (outfile != STDOUT_FILENO)
+        if (p->stdout != STDOUT_FILENO)
         {
-                dup2 (outfile, STDOUT_FILENO);
-                close (outfile);
+                dup2 (p->stdout, STDOUT_FILENO);
+                close (p->stdout);
         }
-        if (errfile != STDERR_FILENO)
+        if (p->stderr != STDERR_FILENO)
         {
-                dup2 (errfile, STDERR_FILENO);
-                close (errfile);
+                dup2 (p->stderr, STDERR_FILENO);
+                close (p->stderr);
         }
 
         execvp (p->argv[0], p->argv);
         perror ("launch process execvp");
-        exit (1);
+        exit (EXIT_FAILURE);
 }
 
 /*
@@ -120,6 +120,9 @@ process* create_process (char** argv)
         new_process->argv = argv;
         new_process->completed = 0;
         new_process->stopped = 0;
+        new_process->stdin = STDIN_FILENO;
+        new_process->stdout = STDOUT_FILENO;
+        new_process->stderr = STDERR_FILENO;
 
         return new_process;
 }

@@ -117,8 +117,6 @@ void launch_job (job* j)
 {
         process* p = j->first_process;
         int mypipe[2];
-        int infile = j->stdin;
-        int outfile;
 
         while (p != NULL)
         {
@@ -129,17 +127,17 @@ void launch_job (job* j)
                                 perror ("pipe");
                                 exit (EXIT_FAILURE);
                         }
-                        outfile = mypipe[1];
-                }
-                else
-                {
-                        outfile = j->stdout;
+
+                        if (p->stdout == STDOUT_FILENO)
+                        {
+                                p->stdout = mypipe[1];
+                        }
                 }
 
                 pid_t pid = fork ();
                 if (pid == 0)
                 {
-                        launch_process (p, j->pgid, infile, outfile, j->stderr, j->foreground);
+                        launch_process (p, j->pgid, j->foreground);
                 }
                 else if (pid < 0)
                 {
@@ -158,13 +156,17 @@ void launch_job (job* j)
                         }
                 }
 
-                if (infile != j->stdin)
-                        close (infile);
-                if (outfile != j->stdout)
-                        close (outfile);
+                if (p->stdin != STDIN_FILENO)
+                        close (p->stdin);
+                if (p->stdout != STDOUT_FILENO)
+                        close (p->stdout);
                 
-                infile = mypipe[0];
                 p = p->next;
+                
+                if (p != NULL && p->stdin == STDIN_FILENO)
+                {
+                        p->stdin = mypipe[0];
+                }
         }
 
         if(j->foreground)
@@ -271,14 +273,11 @@ allocates and returns a job with provided values
 the command argument needs to point to an allocted string 
 which must not be manually deallocated after creating the job
 */
-job* create_job (process* first_process, int in, int out, int err, int foreground, char* command)
+job* create_job (process* first_process, int foreground, char* command)
 {
         job* new_job = malloc (sizeof (job));
         new_job->next = NULL;
         new_job->first_process = first_process;
-        new_job->stdin = in;
-        new_job->stdout = out;
-        new_job->stderr = err;
         new_job->foreground = foreground;
         new_job->command = command;
         new_job->pgid = 0;

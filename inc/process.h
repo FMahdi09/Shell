@@ -13,11 +13,14 @@ typedef struct process
         int completed;
         int stopped;
         int status;
+        int stdout;
+        int stdin;
+        int stderr;
 } process;
 
 /* FUNCTION DECLARATIONS */
 
-void launch_process (process* p, pid_t pgid, int infile, int outfile, int errfile, int foreground);
+void launch_process (process* p, pid_t pgid, int foreground);
 int mark_process_status (pid_t pid, int status);
 process* add_process (process* head, process* new);
 process* create_process (char** argv);

@@ -82,16 +82,18 @@ char** parse_input_string (char* buffer)
 }
 
 /*
-takes in an array of cl arguments and constructs a job according to them
+takes in a null terminated array of cl arguments and constructs a job accordingly
 returns NULL if the arguments are invalid
 */
 job* parse_job (char** command)
 {
         char** tmp = command;
+        char** argv;
         int start = 0;
         int cur = start;
-        process* first_process = NULL;
         int foreground = 1;
+        int make_process = 0;
+        process* first_process = NULL;
 
         while (*tmp)
         {
@@ -104,32 +106,48 @@ job* parse_job (char** command)
                                 return NULL;
                         }
 
-                        char** argv = copy_string_arr (command + start, cur - start);
-
-                        process* new_process = create_process (argv);
-
-                        first_process = add_process (first_process, new_process);
-
+                        argv = copy_string_arr (command + start, cur - start);
                         start = cur + 1;
+                        make_process = 1;
+                }
+                else if (strcmp (*tmp, ">") == 0)
+                {
+                        if (cur == start ||
+                            *(tmp + 1) == NULL)
+                        {
+                                fprintf (stderr, "invalid syntax\n");
+                                return NULL;
+                        }
+
+                        argv = copy_string_arr (command + start, cur - start);
+                        make_process = 1;
+
+                        
                 }
                 else if (*(tmp + 1) == NULL &&
                          strcmp (*tmp, "&") == 0)
                 {
+                        if (cur == start)
+                        {
+                                fprintf (stderr, "invalid syntax\n");
+                                return NULL;
+                        }
+
+                        argv = copy_string_arr (command + start, cur - start);
                         foreground = 0;
-                        
-                        char** argv = copy_string_arr (command + start, cur - start);
-
-                        process* new_process = create_process (argv);
-
-                        first_process = add_process (first_process, new_process);
+                        make_process = 1;       
                 }
                 else if (*(tmp + 1) == NULL)
                 {
-                        char** argv = copy_string_arr (command + start, cur + 1 - start);
+                        argv = copy_string_arr (command + start, cur + 1 - start);
+                        make_process = 1;
+                }
 
+                if (make_process)
+                {
                         process* new_process = create_process (argv);
-
                         first_process = add_process (first_process, new_process);
+                        make_process = 0;
                 }
 
                 ++cur;
@@ -140,9 +158,6 @@ job* parse_job (char** command)
 
         job* new_job = create_job (
                 first_process,
-                STDIN_FILENO,
-                STDOUT_FILENO,
-                STDERR_FILENO,
                 foreground,
                 command_string
         );
