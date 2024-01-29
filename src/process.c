@@ -113,15 +113,15 @@ process* add_process (process* head, process* new)
 /*
 creates a new process with next set to null and argv set to provided string array
 */
-process* create_process (char** argv)
+process* create_process (char** argv, int out, int in)
 {
         process* new_process = malloc (sizeof (process));
         new_process->next = NULL;
         new_process->argv = argv;
         new_process->completed = 0;
         new_process->stopped = 0;
-        new_process->stdin = STDIN_FILENO;
-        new_process->stdout = STDOUT_FILENO;
+        new_process->stdin = in;
+        new_process->stdout = out;
         new_process->stderr = STDERR_FILENO;
 
         return new_process;

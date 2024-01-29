@@ -32,6 +32,19 @@ void free_string_arr (char** arr)
 }
 
 /*
+deallocates memory of a string array with given size
+*/
+void free_string_arr_s (char** arr, size_t size)
+{
+        for (int i = 0; i < size; ++i)
+        {
+                free (arr[i]);
+        }
+
+        free (arr);
+}
+
+/*
 returns a copy of a string array and null terminates it
 */
 char** copy_string_arr (char** arr, size_t size)

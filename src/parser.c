@@ -93,6 +93,8 @@ job* parse_job (char** command)
         int cur = start;
         int foreground = 1;
         int make_process = 0;
+        int outfile = STDOUT_FILENO;
+        int infile = STDIN_FILENO;
         process* first_process = NULL;
 
         while (*tmp)
@@ -103,6 +105,7 @@ job* parse_job (char** command)
                             *(tmp + 1) == NULL)
                         {
                                 fprintf (stderr, "invalid syntax\n");
+                                free_process_list (first_process);
                                 return NULL;
                         }
 
@@ -116,6 +119,7 @@ job* parse_job (char** command)
                             *(tmp + 1) == NULL)
                         {
                                 fprintf (stderr, "invalid syntax\n");
+                                free_process_list (first_process);
                                 return NULL;
                         }
 
@@ -130,6 +134,7 @@ job* parse_job (char** command)
                         if (cur == start)
                         {
                                 fprintf (stderr, "invalid syntax\n");
+                                free_process_list (first_process);
                                 return NULL;
                         }
 
@@ -145,9 +150,11 @@ job* parse_job (char** command)
 
                 if (make_process)
                 {
-                        process* new_process = create_process (argv);
+                        process* new_process = create_process (argv, outfile, infile);
                         first_process = add_process (first_process, new_process);
                         make_process = 0;
+                        outfile = STDOUT_FILENO;
+                        infile = STDIN_FILENO;
                 }
 
                 ++cur;
