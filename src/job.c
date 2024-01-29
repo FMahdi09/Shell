@@ -128,9 +128,13 @@ void launch_job (job* j)
                                 exit (EXIT_FAILURE);
                         }
 
-                        if (p->stdout == STDOUT_FILENO)
+                        if (p->std_out == STDOUT_FILENO)
                         {
-                                p->stdout = mypipe[1];
+                                p->std_out = mypipe[1];
+                        }
+                        else
+                        {
+                                close (mypipe[1]);
                         }
                 }
 
@@ -156,16 +160,16 @@ void launch_job (job* j)
                         }
                 }
 
-                if (p->stdin != STDIN_FILENO)
-                        close (p->stdin);
-                if (p->stdout != STDOUT_FILENO)
-                        close (p->stdout);
+                if (p->std_in != STDIN_FILENO)
+                        close (p->std_in);
+                if (p->std_out != STDOUT_FILENO)
+                        close (p->std_out);
                 
                 p = p->next;
                 
-                if (p != NULL && p->stdin == STDIN_FILENO)
+                if (p != NULL && p->std_in == STDIN_FILENO)
                 {
-                        p->stdin = mypipe[0];
+                        p->std_in = mypipe[0];
                 }
         }
 

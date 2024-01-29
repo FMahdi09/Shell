@@ -33,20 +33,20 @@ void launch_process (process* p, pid_t pgid, int foreground)
                 signal (SIGTTOU, SIG_DFL);
         }
 
-        if (p->stdin != STDIN_FILENO)
+        if (p->std_in != STDIN_FILENO)
         {
-                dup2 (p->stdin, STDIN_FILENO);
-                close (p->stdin);
+                dup2 (p->std_in, STDIN_FILENO);
+                close (p->std_in);
         }
-        if (p->stdout != STDOUT_FILENO)
+        if (p->std_out != STDOUT_FILENO)
         {
-                dup2 (p->stdout, STDOUT_FILENO);
-                close (p->stdout);
+                dup2 (p->std_out, STDOUT_FILENO);
+                close (p->std_out);
         }
-        if (p->stderr != STDERR_FILENO)
+        if (p->std_err != STDERR_FILENO)
         {
-                dup2 (p->stderr, STDERR_FILENO);
-                close (p->stderr);
+                dup2 (p->std_err, STDERR_FILENO);
+                close (p->std_err);
         }
 
         execvp (p->argv[0], p->argv);
@@ -120,9 +120,9 @@ process* create_process (char** argv, int out, int in)
         new_process->argv = argv;
         new_process->completed = 0;
         new_process->stopped = 0;
-        new_process->stdin = in;
-        new_process->stdout = out;
-        new_process->stderr = STDERR_FILENO;
+        new_process->std_in = in;
+        new_process->std_out = out;
+        new_process->std_err = STDERR_FILENO;
 
         return new_process;
 }

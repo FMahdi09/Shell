@@ -13,9 +13,9 @@ typedef struct process
         int completed;
         int stopped;
         int status;
-        int stdout;
-        int stdin;
-        int stderr;
+        int std_out;
+        int std_in;
+        int std_err;
 } process;
 
 /* FUNCTION DECLARATIONS */

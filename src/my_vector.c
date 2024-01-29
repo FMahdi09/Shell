@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "my_vector.h"
 #include "menial.h"
@@ -10,7 +11,7 @@ allocates and initializes a my_vector with default values
 my_vector* create_vector ()
 {
         my_vector* new_vector = malloc (sizeof (my_vector));
-        new_vector->argv = malloc (sizeof (char*) * VECTOR_DEFAULT_SIZE);
+        new_vector->argv = calloc (VECTOR_DEFAULT_SIZE, sizeof (char*));
         new_vector->cur_size = 0;
         new_vector->max_size = VECTOR_DEFAULT_SIZE;
 
@@ -37,5 +38,5 @@ void add_string (my_vector* v, char* str)
                 v->argv = realloc (v->argv, v->max_size);
         }
 
-        v->argv[v->cur_size++] = str;
+        v->argv[v->cur_size++] = strdup (str);
 }

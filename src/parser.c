@@ -4,9 +4,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 #include "job.h"
 #include "menial.h"
+#include "my_vector.h"
 
 /*
 trims all leading/trailing whitespaces
@@ -86,6 +89,115 @@ takes in a null terminated array of cl arguments and constructs a job accordingl
 returns NULL if the arguments are invalid
 */
 job* parse_job (char** command)
+{
+        int foreground = 1;
+        int infile = STDIN_FILENO;
+        int outfile = STDOUT_FILENO;
+        int make_process = 0;
+        char** full_command = command;
+        char** argv;
+        my_vector* arguments = create_vector ();
+        process* first_process = NULL;
+
+        while (*command)
+        {
+                if (strcmp (*command, "|") == 0)
+                {
+                        if (arguments->cur_size == 0 ||
+                            *(command + 1) == NULL)
+                        {
+                                fprintf (stderr, "invalid syntax\n");
+                                free_vector (arguments);
+                                free_process_list (first_process);
+                                return NULL;
+                        }
+
+                        argv = copy_string_arr (arguments->argv, arguments->cur_size);
+                        make_process = 1;
+                }
+                else if (strcmp (*command, ">") == 0)
+                {
+                        if (arguments->cur_size == 0            ||
+                            *(command + 1) == NULL              ||
+                            strcmp (*(command + 1), "|") == 0   ||
+                            strcmp (*(command + 1), ">") == 0   ||
+                            strcmp (*(command + 1), "<") == 0)
+                        {
+                                fprintf (stderr, "invalid syntax\n");
+                                free_vector (arguments);
+                                free_process_list (first_process);
+                                return NULL;
+                        }
+
+                        outfile = open (*(command + 1), O_CREAT | O_WRONLY | O_TRUNC, S_IRWXG | S_IRWXU);
+
+                        if (outfile == -1)
+                        {
+                                perror (*(command + 1));
+                                free_vector (arguments);
+                                free_process_list (first_process);
+                                return NULL;
+                        }
+
+                        ++command;
+
+                        if (*(command + 1) == NULL)
+                        {
+                                make_process = 1;
+                                argv = copy_string_arr (arguments->argv, arguments->cur_size);
+                        }
+                }
+                else if (*(command + 1) == NULL)
+                {
+                        if (strcmp (*command, "&") == 0)
+                                foreground = 0;
+                        else
+                                add_string (arguments, *command);
+
+                        if (arguments->cur_size == 0)
+                        {
+                                fprintf (stderr, "invalid syntax\n");
+                                free_process_list (first_process);
+                                return NULL;
+                        }
+
+                        argv = copy_string_arr (arguments->argv, arguments->cur_size);
+                        make_process = 1;
+                }
+                else
+                {
+                        add_string (arguments, *command);
+                }
+
+                if (make_process)
+                {
+                        process* new_process = create_process (argv, outfile, infile);
+                        first_process = add_process (first_process, new_process);
+                        infile = STDIN_FILENO;
+                        outfile = STDOUT_FILENO;
+                        free_vector (arguments);
+                        arguments = create_vector ();
+                        make_process = 0;
+                }
+
+                ++command;
+        }
+
+        free_vector (arguments);
+        
+        char* command_string = string_from_arr (full_command);
+
+        job* new_job = create_job (
+                first_process,
+                foreground,
+                command_string
+        );
+
+        return new_job;
+}
+
+
+job* parse_job2 (char** command)
 {
         char** tmp = command;
         char** argv;
