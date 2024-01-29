@@ -146,7 +146,7 @@ void launch_job (job* j)
                 else if (pid < 0)
                 {
                         perror ("fork");
-                        exit (1);
+                        exit (EXIT_FAILURE);
                 }
                 else
                 {
@@ -170,6 +170,10 @@ void launch_job (job* j)
                 if (p != NULL && p->std_in == STDIN_FILENO)
                 {
                         p->std_in = mypipe[0];
+                }
+                else if (p != NULL)
+                {
+                        close (mypipe[0]);
                 }
         }
 
