@@ -116,13 +116,15 @@ job* parse_job (char** command)
                         make_process = 1;
                 }
                 else if (strcmp (*command, ">") == 0    ||
-                         strcmp (*command, "<") == 0)
+                         strcmp (*command, "<") == 0    ||
+                         strcmp (*command, ">>") == 0)
                 {
                         if (arguments->cur_size == 0            ||
                             *(command + 1) == NULL              ||
                             strcmp (*(command + 1), "|") == 0   ||
                             strcmp (*(command + 1), ">") == 0   ||
-                            strcmp (*(command + 1), "<") == 0)
+                            strcmp (*(command + 1), "<") == 0   ||
+                            strcmp (*(command + 1), ">>") == 0)
                         {
                                 fprintf (stderr, "invalid syntax\n");
                                 free_vector (arguments);
@@ -136,6 +138,8 @@ job* parse_job (char** command)
                                 options = O_RDONLY;
                         else if (strcmp (*command, ">") == 0)
                                 options = O_CREAT | O_WRONLY | O_TRUNC;
+                        else if (strcmp (*command, ">>") == 0)
+                                options = O_CREAT | O_WRONLY | O_APPEND;
 
                         int fd = open (*(command + 1), options, S_IRWXG | S_IRWXU);
 
@@ -149,7 +153,8 @@ job* parse_job (char** command)
 
                         if (strcmp (*command, "<") == 0)
                                 infile = fd;
-                        else if (strcmp (*command, ">") == 0)
+                        else if (strcmp (*command, ">") == 0 ||
+                                 strcmp (*command, ">>") == 0)
                                 outfile = fd;
 
                         ++command;
